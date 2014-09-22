@@ -2,7 +2,7 @@
 
 test("chainable", function() {
     ok($("#input1").maskMoney().val("123"), "can be chained");
-    equal($("#input1").val(), "123", "class was added correctly from chaining");
+    equal($("#input1").val(), "1.23", "class was added correctly from chaining");
 });
 
 test("init", function() {
