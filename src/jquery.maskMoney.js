@@ -195,9 +195,11 @@
 
                     function mask() {
                         var value = $origVal.call($input);
+
                         value = maskValue(value);
+
                         $origVal.call($input, value);
-                        console.log(value);
+
                         return value;
                     }
 
@@ -405,7 +407,6 @@
             }
         };
 
-    // Ensure everyone calls to .val for everything else are chill.
     $.fn.overrideNodeMethod = function(methodName, action) {
         var originalVal = $.fn[methodName];
         var thisNode = this;
