@@ -195,7 +195,10 @@
 
                     function mask() {
                         var value = $origVal.call($input);
-                        $origVal.call($input, maskValue(value));
+                        value = maskValue(value);
+                        $origVal.call($input, value);
+                        console.log(value);
+                        return value;
                     }
 
                     function changeSign() {
@@ -386,21 +389,33 @@
                     $input.bind("cut.maskMoney", cutPasteEvent);
                     $input.bind("paste.maskMoney", cutPasteEvent);
                     $input.bind("mask.maskMoney", mask);
+
+                    function programmaticSet(value) {
+                        if(typeof value === "undefined") {
+                            return $origVal.call($input);
+                        } else {
+                            console.log("Should Have been here");
+                            $origVal.call($input, value);
+                            return mask();
+                        }
+                    }
+
+                    $input.overrideNodeMethod("val", programmaticSet);
                 });
             }
         };
 
-    // Override jquerys .val() so that programmatic sets still work.
-    $.fn.val = function(value) {
-        if (typeof value === "undefined") {
-            return $origVal.call(this);
-        } else {
-            setTimeout(function() {
-                console.log("it got ehre");
-                this.maskMoney("mask");
-            }, 10);
-            return $origVal.call(this, value);
-        }
+    // Ensure everyone calls to .val for everything else are chill.
+    $.fn.overrideNodeMethod = function(methodName, action) {
+        var originalVal = $.fn[methodName];
+        var thisNode = this;
+        $.fn[methodName] = function() {
+            if (this[0] === thisNode[0]) {
+                return action.apply(this, arguments);
+            } else {
+                return originalVal.apply(this, arguments);
+            }
+        };
     };
 
     $.fn.maskMoney = function (method) {
